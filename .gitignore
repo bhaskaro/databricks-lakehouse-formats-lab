@@ -1,0 +1,18 @@
+# Spark runtime artifacts
+**/eventlog/
+**/eventlog-*/
+**/data/
+**/_temporary/
+**/*.crc
+
+# Spark outputs
+**/bigdata_*/
+**/bigdata_result_*/
+
+# Docker
+**/.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+

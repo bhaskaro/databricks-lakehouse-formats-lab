@@ -1,0 +1,49 @@
+services:
+  spark-master:
+    image: spark:latest
+    container_name: spark-master
+    hostname: spark-master
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.master.Master
+      --host spark-master
+    ports:
+      - "8080:8080"   # Master UI
+      - "7077:7077"   # Master RPC
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+      - ./eventlog:/opt/spark-eventlog
+
+  spark-worker:
+    image: spark:latest
+    hostname: spark-worker
+    depends_on:
+      - spark-master
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.worker.Worker
+      spark://spark-master:7077
+    deploy:
+      replicas: 10
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+      - ./eventlog:/opt/spark-eventlog
+
+  spark-history:
+    image: spark:latest
+    container_name: spark-history
+    hostname: spark-history
+    depends_on:
+      - spark-master
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.history.HistoryServer
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./eventlog:/opt/spark-eventlog
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark-eventlog
+

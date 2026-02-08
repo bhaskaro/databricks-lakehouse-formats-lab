@@ -1,0 +1,132 @@
+version: "3.8"
+
+services:
+  # ========= Cluster A =========
+  spark-master-a:
+    image: spark:latest
+    hostname: spark-master-a
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.master.Master
+      --host spark-master-a
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+      - ./eventlog-a:/opt/spark-eventlog
+
+  spark-worker-a:
+    image: spark:latest
+    depends_on:
+      - spark-master-a
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.worker.Worker
+      spark://spark-master-a:7077
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./eventlog-a:/opt/spark-eventlog
+
+  spark-history-a:
+    image: spark:latest
+    depends_on:
+      - spark-master-a
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.history.HistoryServer
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./eventlog-a:/opt/spark-eventlog
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark-eventlog
+
+  # ========= Cluster B =========
+  spark-master-b:
+    image: spark:latest
+    hostname: spark-master-b
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.master.Master
+      --host spark-master-b
+    ports:
+      - "8180:8080"
+      - "7177:7077"
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+      - ./eventlog-b:/opt/spark-eventlog
+
+  spark-worker-b:
+    image: spark:latest
+    depends_on:
+      - spark-master-b
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.worker.Worker
+      spark://spark-master-b:7077
+    ports:
+      - "8181:8081"
+    volumes:
+      - ./eventlog-b:/opt/spark-eventlog
+
+  spark-history-b:
+    image: spark:latest
+    depends_on:
+      - spark-master-b
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.history.HistoryServer
+    ports:
+      - "18180:18080"
+    volumes:
+      - ./eventlog-b:/opt/spark-eventlog
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark-eventlog
+
+  # ========= Cluster C =========
+  spark-master-c:
+    image: spark:latest
+    hostname: spark-master-c
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.master.Master
+      --host spark-master-c
+    ports:
+      - "8280:8080"
+      - "7277:7077"
+    volumes:
+      - ./apps:/opt/spark-apps
+      - ./data:/opt/spark-data
+      - ./eventlog-c:/opt/spark-eventlog
+
+  spark-worker-c:
+    image: spark:latest
+    depends_on:
+      - spark-master-c
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.worker.Worker
+      spark://spark-master-c:7077
+    ports:
+      - "8281:8081"
+    volumes:
+      - ./eventlog-c:/opt/spark-eventlog
+
+  spark-history-c:
+    image: spark:latest
+    depends_on:
+      - spark-master-c
+    command: >
+      /opt/spark/bin/spark-class
+      org.apache.spark.deploy.history.HistoryServer
+    ports:
+      - "18280:18080"
+    volumes:
+      - ./eventlog-c:/opt/spark-eventlog
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark-eventlog
+
