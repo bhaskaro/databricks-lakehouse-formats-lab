@@ -1,6 +1,6 @@
 services:
   spark-master:
-    image: spark:latest
+    image: apache/spark:3.5.1
     container_name: spark-master
     hostname: spark-master
     command: >
@@ -16,7 +16,7 @@ services:
       - ./eventlog:/opt/spark-eventlog
 
   spark-worker:
-    image: spark:latest
+    image: apache/spark:3.5.1
     hostname: spark-worker
     depends_on:
       - spark-master
@@ -32,7 +32,7 @@ services:
       - ./eventlog:/opt/spark-eventlog
 
   spark-history:
-    image: spark:latest
+    image: apache/spark:3.5.1
     container_name: spark-history
     hostname: spark-history
     depends_on:
